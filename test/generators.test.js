@@ -32,6 +32,8 @@ test('all generators return bounded SVG documents', () => {
         assert.ok(svg.length < 1_000_000);
         assert.doesNotMatch(svg, /<script/i);
     }
+
+    assert.match(outputs[1], /\d+\.\d{2}% lived/);
 });
 
 test('goal names are XML escaped', () => {

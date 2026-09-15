@@ -94,7 +94,7 @@ export function generateLifeCalendar(options) {
     }
 
     // Stats just below grid
-    const progressPercent = Math.round((weeksLived / totalWeeks) * 100);
+    const progressPercent = ((weeksLived / totalWeeks) * 100).toFixed(2);
     const weeksRemaining = totalWeeks - weeksLived;
     const statsY = startY + gridHeight + (height * 0.025);
 

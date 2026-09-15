@@ -1585,7 +1585,10 @@ function drawLifePreview(ctx, width, height) {
 
     // Stats just below grid with padding
     const weeksLeft = totalWeeks - weeksLived;
-    const percent = Math.round((weeksLived / totalWeeks) * 100);
+    const percent = new Intl.NumberFormat(state.language, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format((weeksLived / totalWeeks) * 100);
     const statsY = startY + gridHeight + (height * 0.035);
 
     // Split text rendering
