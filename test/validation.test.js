@@ -10,12 +10,27 @@ test('accepts a supported wallpaper request', () => {
     assert.equal(result.country, 'tw');
     assert.equal(result.type, 'goal');
     assert.equal(result.goalName, 'My Goal');
+    assert.equal(result.scale, 2);
 });
 
 test('rejects dimensions above the supported device envelope', () => {
     const url = new URL('https://example.com/generate?width=8000&height=8000');
 
     assert.throws(() => validateParams(url), /too large/i);
+});
+
+test('bounds high-resolution PNG output while allowing supported 2x devices', () => {
+    const supported = validateParams(new URL('https://example.com/generate?width=1440&height=3120&scale=2'));
+    assert.equal(supported.scale, 2);
+
+    assert.throws(
+        () => validateParams(new URL('https://example.com/generate?width=2200&height=3200&scale=2')),
+        /output pixel limit/i
+    );
+    assert.throws(
+        () => validateParams(new URL('https://example.com/generate?width=1179&height=2556&scale=3')),
+        /<=2/i
+    );
 });
 
 test('rejects markup in colors and impossible dates', () => {

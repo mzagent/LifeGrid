@@ -93,7 +93,7 @@ async function handleGenerate(request, url, corsHeaders, ctx) {
 
         // Generate cache key based on parameters and current date
         const today = new Date().toISOString().split('T')[0];
-        const cacheKey = `${validated.country}-${validated.type}-${validated.bg}-${validated.accent}-${validated.width}x${validated.height}-${today}`;
+        const cacheKey = `${validated.country}-${validated.type}-${validated.bg}-${validated.accent}-${validated.width}x${validated.height}-${validated.scale}x-${today}`;
 
         // Build a cache request URL to use with caches.default (Cloudflare Workers)
         // Only enable server-side caching for the non-user-specific `year` type
@@ -150,8 +150,12 @@ async function handleGenerate(request, url, corsHeaders, ctx) {
         // Convert SVG to PNG using resvg
         const resvg = new Resvg(svg, {
             fitTo: {
-                mode: 'original'
+                mode: 'zoom',
+                value: validated.scale
             },
+            shapeRendering: 2,
+            textRendering: 2,
+            imageRendering: 0,
             font: {
                 loadSystemFonts: false,
                 defaultFontFamily: 'Inter',

@@ -28,6 +28,7 @@ LifeGrid generates high-resolution, data-driven wallpapers that help you visuali
 
 - **Pixel-Perfect**
   - Native resolution generation for all modern iPhones (13 mini to 16 Pro Max).
+  - PNG wallpapers render at 2× the selected device resolution for sharper iOS downsampling.
   - Smart layout adjustments for Notch vs Dynamic Island devices.
   - Retina-quality live previews (+10% contrast boost filter).
 
@@ -119,6 +120,7 @@ GET /generate?country=us&type=year&bg=000000&accent=FFFFFF&width=1179&height=255
 | `accent` | Accent color (hex without #) |
 | `width` | Image width in pixels |
 | `height` | Image height in pixels |
+| `scale` | PNG render scale (`1` or `2`; default: `2`) |
 | `dob` | Date of birth for life calendar |
 | `lifespan` | Expected years (default: 80) |
 | `goal` | Target date for countdown |

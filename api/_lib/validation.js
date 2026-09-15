@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+const MAX_OUTPUT_PIXELS = 20_000_000;
+
 // Helper to validate that a YYYY-MM-DD string is a real date
 const isValidDate = (dateStr) => {
     const [year, month, day] = dateStr.split('-').map(Number);
@@ -21,6 +23,7 @@ export const wallpaperSchema = z.object({
     accent: z.string().regex(/^[0-9A-Fa-f]{6}$/, "Invalid hex color").default('FFFFFF'),
     width: z.coerce.number().int().min(300, "Width too small").max(2200, "Width too large").default(1170),
     height: z.coerce.number().int().min(300, "Height too small").max(3200, "Height too large").default(2532),
+    scale: z.coerce.number().int().min(1).max(2).default(2),
     clockHeight: z.coerce.number().min(0).max(0.5).default(0.18),
 
     // Life Calendar specific
@@ -45,6 +48,11 @@ export const wallpaperSchema = z.object({
 }, {
     message: "Goal start date must be on or before the goal date",
     path: ["goalStart"]
+}).refine((data) => {
+    return data.format === 'svg' || (data.width * data.height * data.scale * data.scale) <= MAX_OUTPUT_PIXELS;
+}, {
+    message: "Rendered image exceeds the output pixel limit",
+    path: ["scale"]
 });
 
 export function validateParams(url) {

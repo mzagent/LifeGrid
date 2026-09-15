@@ -10,6 +10,7 @@ import { devices, getDevice } from './data/devices.js';
 // Keep personal wallpaper settings on this deployment instead of sending them
 // to the original project's Cloudflare Worker.
 const WORKER_URL = window.location.origin;
+const PNG_SCALE = 2;
 
 // ===== State =====
 const state = {
@@ -1356,7 +1357,7 @@ function selectDevice(deviceName) {
     state.clockHeight = device.clockHeight || 0.18;
 
     // Update resolution hint
-    elements.deviceResolution.textContent = `${device.width} × ${device.height}`;
+    elements.deviceResolution.textContent = `${device.width * PNG_SCALE} × ${device.height * PNG_SCALE} output (2×)`;
 
     updatePreview();
     updateURL();
@@ -1720,6 +1721,7 @@ function updateURL() {
     params.set('accent', state.accentColor.replace('#', ''));
     params.set('width', state.width);
     params.set('height', state.height);
+    params.set('scale', PNG_SCALE);
     params.set('clockHeight', state.clockHeight);  // Pass clock height for proper spacing
 
     if (state.selectedType === 'life') {
