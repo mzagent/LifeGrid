@@ -1,0 +1,6 @@
+.git/
+.github/
+test/
+screenshots/
+*.md
+github_banner.png

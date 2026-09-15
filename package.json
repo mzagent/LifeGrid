@@ -1,0 +1,19 @@
+{
+  "name": "lifegrid-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LifeGrid dynamic wallpaper generator, packaged for Vercel",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "security:audit": "npm audit --omit=dev"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "inter-font": "3.19.0",
+    "zod": "4.6.5"
+  }
+}

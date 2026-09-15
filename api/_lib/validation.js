@@ -15,12 +15,12 @@ const dateSchema = z.string()
     .refine(isValidDate, "Invalid date - date does not exist");
 
 export const wallpaperSchema = z.object({
-    country: z.string().min(2).max(5).default('us').transform(val => val.toLowerCase()),
+    country: z.string().regex(/^[A-Za-z]{2}$/, "Invalid country code").default('us').transform(val => val.toLowerCase()),
     type: z.enum(['year', 'life', 'goal']).default('year'),
     bg: z.string().regex(/^[0-9A-Fa-f]{6}$/, "Invalid hex color").default('000000'),
     accent: z.string().regex(/^[0-9A-Fa-f]{6}$/, "Invalid hex color").default('FFFFFF'),
-    width: z.coerce.number().int().min(300, "Width too small").max(8000, "Width too large").default(1170),
-    height: z.coerce.number().int().min(300, "Height too small").max(8000, "Height too large").default(2532),
+    width: z.coerce.number().int().min(300, "Width too small").max(2200, "Width too large").default(1170),
+    height: z.coerce.number().int().min(300, "Height too small").max(3200, "Height too large").default(2532),
     clockHeight: z.coerce.number().min(0).max(0.5).default(0.18),
 
     // Life Calendar specific
@@ -30,7 +30,10 @@ export const wallpaperSchema = z.object({
     // Goal specific
     goal: dateSchema.optional(),
     goalStart: dateSchema.optional(),
-    goalName: z.string().max(100, "Goal name too long").default('Goal'),
+    goalName: z.string()
+        .max(100, "Goal name too long")
+        .regex(/^[^\p{Cc}]*$/u, "Goal name contains unsupported control characters")
+        .default('Goal'),
 
     format: z.enum(['png', 'svg']).default('png')
 }).refine((data) => {

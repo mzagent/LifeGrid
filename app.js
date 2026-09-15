@@ -7,7 +7,9 @@ import { countries } from './data/countries.js';
 import { devices, getDevice } from './data/devices.js';
 
 // ===== Configuration =====
-const WORKER_URL = 'https://lifegrid.aradhyaxstudy.workers.dev';
+// Keep personal wallpaper settings on this deployment instead of sending them
+// to the original project's Cloudflare Worker.
+const WORKER_URL = window.location.origin;
 
 // ===== State =====
 const state = {
@@ -138,7 +140,7 @@ const TRANSLATIONS = {
             },
             step3: {
                 title: 'Configure Shortcut',
-                desc: '<strong>1. Get Contents of URL:</strong><br><span class="code-snippet">https://lifegrid.aradhyaxstudy.workers.dev/generate?...</span><br><br><strong>2. Set Wallpaper Photo:</strong><br>Choose "Lock Screen" as the target.'
+                desc: '<strong>1. Get Contents of URL:</strong><br><span class="code-snippet">Use the link generated above.</span><br><br><strong>2. Set Wallpaper Photo:</strong><br>Choose "Lock Screen" as the target.'
             },
             step4: {
                 title: 'Finalize',
@@ -298,7 +300,7 @@ const TRANSLATIONS = {
             },
             step3: {
                 title: '配置快捷指令',
-                desc: '<strong>1. 获取 URL 内容：</strong><br><span class="code-snippet">https://lifegrid.aradhyaxstudy.workers.dev/generate?...</span><br><br><strong>2. 设置壁纸：</strong><br>选择“锁定屏幕”作为目标。'
+                desc: '<strong>1. 获取 URL 内容：</strong><br><span class="code-snippet">使用上方生成的链接。</span><br><br><strong>2. 设置壁纸：</strong><br>选择“锁定屏幕”作为目标。'
             },
             step4: {
                 title: '完成',
@@ -458,7 +460,7 @@ const TRANSLATIONS = {
             },
             step3: {
                 title: '設定捷徑',
-                desc: '<strong>1. 取得 URL 內容：</strong><br><span class="code-snippet">https://lifegrid.aradhyaxstudy.workers.dev/generate?...</span><br><br><strong>2. 設定桌布：</strong><br>選擇「鎖定畫面」作為目標。'
+                desc: '<strong>1. 取得 URL 內容：</strong><br><span class="code-snippet">使用上方產生的連結。</span><br><br><strong>2. 設定桌布：</strong><br>選擇「鎖定畫面」作為目標。'
             },
             step4: {
                 title: '完成',
@@ -618,7 +620,7 @@ const TRANSLATIONS = {
             },
             step3: {
                 title: 'ショートカット設定',
-                desc: '<strong>1. URLの内容を取得：</strong><br><span class="code-snippet">https://lifegrid.aradhyaxstudy.workers.dev/generate?...</span><br><br><strong>2. 壁紙を設定：</strong><br>対象は「ロック画面」を選択。'
+                desc: '<strong>1. URLの内容を取得：</strong><br><span class="code-snippet">上で生成したリンクを使用します。</span><br><br><strong>2. 壁紙を設定：</strong><br>対象は「ロック画面」を選択。'
             },
             step4: {
                 title: '完了',
@@ -778,7 +780,7 @@ const TRANSLATIONS = {
             },
             step3: {
                 title: 'Configurer le raccourci',
-                desc: '<strong>1. Obtenir le contenu de l URL :</strong><br><span class="code-snippet">https://lifegrid.aradhyaxstudy.workers.dev/generate?...</span><br><br><strong>2. Definir le fond :</strong><br>Choisissez "Ecran verrouille".'
+                desc: '<strong>1. Obtenir le contenu de l URL :</strong><br><span class="code-snippet">Utilisez le lien genere ci-dessus.</span><br><br><strong>2. Definir le fond :</strong><br>Choisissez "Ecran verrouille".'
             },
             step4: {
                 title: 'Finaliser',
@@ -1725,7 +1727,7 @@ function updateURL() {
     if (state.selectedType === 'goal') {
         if (state.goalStart) params.set('goalStart', state.goalStart);
         if (state.goalDate) params.set('goal', state.goalDate);
-        if (state.goalName) params.set('goalName', encodeURIComponent(state.goalName));
+        if (state.goalName) params.set('goalName', state.goalName);
     }
 
     const url = `${WORKER_URL}/generate?${params.toString()}`;

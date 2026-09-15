@@ -52,7 +52,7 @@ export function generateGoalCountdown(options) {
     // Progress represents REMAINING time - arc decreases as time passes
     // Clamp slightly below 1 to avoid unreliable full 360° SVG arcs
     const rawProgress = daysRemaining / totalDays;
-    const progress = Math.max(0, Math.min(1, rawProgress));
+    const progress = Math.max(0, Math.min(0.9999, rawProgress));
 
     // Leave space for clock (with extra padding)
     const clockSpace = height * (clockHeight + 0.05);
@@ -98,8 +98,8 @@ export function generateGoalCountdown(options) {
     });
 
     // Goal name
-    const decodedGoalName = decodeURIComponent(goalName);
-    content += text(centerX, height * 0.75, decodedGoalName, {
+    // URLSearchParams already decodes query values before validation.
+    content += text(centerX, height * 0.75, goalName, {
         fill: '#ffffff',
         fontSize: width * 0.05,
         fontWeight: '600',

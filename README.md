@@ -3,6 +3,12 @@
 
 **Premium Dynamic Wallpapers for iOS and Android Lock Screens.**
 
+This fork packages the original [LifeGrid project](https://github.com/aradhyacp/LifeGrid) for a single Vercel deployment. The browser now generates same-origin wallpaper links, so personal settings are handled by this deployment rather than the original author's service.
+
+### Modifications from upstream
+
+This fork changes the original frontend and documentation, moves the generator from `worker/` to `api/`, replaces the Cloudflare deployment configuration with Vercel configuration, uses bundled fonts during image rendering, adds stricter input/resource validation, and adds automated tests. The changed and added files are visible in Git history; the original copyright and Apache-2.0 license are retained.
+
 LifeGrid generates high-resolution, data-driven wallpapers that help you visualize your time, goals, and life progress directly on your iPhone or Android lock screen. Designed to sit perfectly between the time, widgets, and dynamic island.
 
 ## Tech Stack
@@ -10,7 +16,7 @@ LifeGrid generates high-resolution, data-driven wallpapers that help you visuali
 ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
-![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
 ![Zod](https://img.shields.io/badge/zod-%233068b7.svg?style=for-the-badge&logo=zod&logoColor=white)
 
 ## Features
@@ -27,7 +33,7 @@ LifeGrid generates high-resolution, data-driven wallpapers that help you visuali
 
 - **Architecture**
   - **Frontend**: Lightweight Vanilla JS & CSS. No frameworks, instant load.
-  - **Backend**: Serverless Cloudflare Worker with Rust-based SVG rendering (`resvg`).
+  - **Backend**: Vercel Function with Rust-based SVG rendering (`resvg`).
   - **Security**: Strict Zod schema validation & XSS protection.
 
 ## Screenshots
@@ -42,47 +48,29 @@ LifeGrid generates high-resolution, data-driven wallpapers that help you visuali
 
 ### Prerequisites
 
-- Node.js & npm
-- Cloudflare Wrangler CLI (`npm install -g wrangler`)
+- Node.js 22 and npm
+- A Vercel account and the Vercel CLI
 
-### Backend Setup (Cloudflare Worker)
-
-Navigate to the worker directory and install dependencies:
+### Local setup
 
 ```bash
-cd worker
 npm install
+npm test
+npx vercel dev
 ```
 
-Run locally:
+### Deploy to Vercel
 
 ```bash
-npx wrangler dev
+npx vercel --prod
 ```
-
-Deploy to Cloudflare:
-
-```bash
-npx wrangler deploy
-```
-
-### Frontend Setup
-
-The frontend is a static site. You can serve it with any static file server.
-
-```bash
-# From project root
-npx serve .
-```
-
-Open `http://localhost:3000` to see the wallpaper generator.
 
 ## Security
 
 All inputs are sanitized and validated before processing:
 - **Zod Schema**: Ensures dimensions, colors, and dates strictly adhere to safe formats.
 - **Output Encoding**: Text inputs are XML-escaped to prevent injection.
-- **Resource Limits**: Max dimensions and memory usage capped to prevent DoS.
+- **Resource Limits**: Image dimensions are capped to reduce denial-of-service risk.
 
 ## Supported Devices
 
@@ -102,17 +90,17 @@ lifegrid/
 ├── data/
 │   ├── countries.js    # 65+ countries with timezones
 │   └── devices.js      # Device resolution presets
-└── worker/
-    ├── wrangler.toml   # Cloudflare Worker config
-    ├── package.json    # Dependencies (resvg-wasm)
-    └── src/
-        ├── index.js    # Main entry point
-        ├── timezone.js # Timezone utilities
-        ├── svg.js      # SVG generation helpers
-        └── generators/
-            ├── year.js # Year progress calendar
-            ├── life.js # Life calendar (dots)
-            └── goal.js # Goal countdown (circle)
+├── api/
+│   ├── generate.js     # Vercel Function entry point
+│   └── _lib/
+│       ├── index.js    # Request and PNG rendering logic
+│       ├── timezone.js # Timezone utilities
+│       ├── svg.js      # SVG generation helpers
+│       └── generators/
+│           ├── year.js # Year progress calendar
+│           ├── life.js # Life calendar (dots)
+│           └── goal.js # Goal countdown (circle)
+└── vercel.json         # Same-origin route and security headers
 ```
 
 
@@ -189,4 +177,4 @@ If you find this project useful, please consider giving it a star! It helps othe
 Made with ❤️ for mindful living
 
 <!-- Tags -->
-`#ios` `#iphone` `#wallpaper` `#productivity` `#motivation` `#calendar` `#year-progress` `#life-grid` `#goal-tracking` `#cloudflare-workers` `#serverless` `#javascript` `#svg` `#design` `#minimalism`
+`#ios` `#iphone` `#wallpaper` `#productivity` `#motivation` `#calendar` `#year-progress` `#life-grid` `#goal-tracking` `#vercel` `#serverless` `#javascript` `#svg` `#design` `#minimalism`

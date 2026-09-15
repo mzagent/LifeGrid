@@ -5,6 +5,7 @@ Thumbs.db
 
 # Dependencies
 node_modules/
+.vercel/
 
 # Cloudflare Workers
 .wrangler/

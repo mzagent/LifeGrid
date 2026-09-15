@@ -1,5 +1,5 @@
 /**
- * Life Calendar Wallpaper - Cloudflare Worker
+ * LifeGrid wallpaper generation handler
  * 
  * Generates dynamic wallpaper images based on:
  * - Year progress (days/weeks of the year)
@@ -13,41 +13,13 @@ import { generateLifeCalendar } from './generators/life.js';
 import { generateGoalCountdown } from './generators/goal.js';
 import { validateParams } from './validation.js';
 
-// Resvg WASM for SVG to PNG conversion
-import { Resvg, initWasm } from '@resvg/resvg-wasm';
-import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
+import { createRequire } from 'node:module';
+import { Resvg } from '@resvg/resvg-js';
 
-let wasmInitialized = false;
-
-async function initializeWasm() {
-    if (!wasmInitialized) {
-        await initWasm(resvgWasm);
-        wasmInitialized = true;
-    }
-}
-
-let fontBuffers = [];
-
-async function loadFonts() {
-    if (fontBuffers.length > 0) return;
-
-    try {
-        const fonts = [
-            'https://github.com/rsms/inter/raw/master/docs/font-files/Inter-Regular.woff2',
-            'https://github.com/rsms/inter/raw/master/docs/font-files/Inter-Medium.woff2',
-            'https://github.com/rsms/inter/raw/master/docs/font-files/Inter-SemiBold.woff2',
-            'https://github.com/rsms/inter/raw/master/docs/font-files/Inter-Bold.woff2'
-        ];
-
-        const responses = await Promise.all(fonts.map(url => fetch(url)));
-        const buffers = await Promise.all(responses.map(res => res.arrayBuffer()));
-
-        fontBuffers = buffers.map(buffer => new Uint8Array(buffer));
-        console.log('Fonts loaded successfully');
-    } catch (e) {
-        console.error('Failed to load fonts:', e);
-    }
-}
+const require = createRequire(import.meta.url);
+const fontFiles = ['Regular', 'Medium', 'SemiBold', 'Bold'].map(
+    weight => require.resolve(`inter-font/ttf/Inter-${weight}.ttf`)
+);
 
 export default {
     async fetch(request, env, ctx) {
@@ -58,7 +30,7 @@ export default {
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, OPTIONS',
             'Access-Control-Allow-Headers': 'Content-Type',
-            'Access-Control-Expose-Headers': 'X-Cache-Status, X-Cache-Key, X-Server-Cache'
+            'Access-Control-Expose-Headers': 'X-Cache-Status, X-Server-Cache'
         };
 
         // Handle preflight
@@ -144,7 +116,6 @@ async function handleGenerate(request, url, corsHeaders, ctx) {
                         // Ensure CORS/expose headers present on cached responses
                         Object.entries(corsHeaders).forEach(([k, v]) => headers.set(k, v));
                         headers.set('X-Cache-Status', 'HIT');
-                        headers.set('X-Cache-Key', cacheKey);
                         headers.set('X-Server-Cache', 'enabled');
                         return new Response(buf, { status: cached.status, statusText: cached.statusText, headers });
                     } catch (e) {
@@ -164,8 +135,7 @@ async function handleGenerate(request, url, corsHeaders, ctx) {
                 headers: {
                     ...corsHeaders,
                     'Content-Type': 'image/svg+xml',
-                    'Cache-Control': 'public, max-age=86400', // Cache for 1 day
-                    'X-Cache-Key': cacheKey,
+                    'Cache-Control': 'public, max-age=3600', // Limit stale daily progress to one hour
                     'X-Cache-Status': 'MISS'
                 }
             });
@@ -178,8 +148,6 @@ async function handleGenerate(request, url, corsHeaders, ctx) {
         }
 
         // Convert SVG to PNG using resvg
-        await Promise.all([initializeWasm(), loadFonts()]);
-
         const resvg = new Resvg(svg, {
             fitTo: {
                 mode: 'original'
@@ -187,7 +155,7 @@ async function handleGenerate(request, url, corsHeaders, ctx) {
             font: {
                 loadSystemFonts: false,
                 defaultFontFamily: 'Inter',
-                fontBuffers: fontBuffers // Pass the loaded font buffers
+                fontFiles
             }
         });
 
@@ -198,8 +166,7 @@ async function handleGenerate(request, url, corsHeaders, ctx) {
             headers: {
                 ...corsHeaders,
                 'Content-Type': 'image/png',
-                'Cache-Control': 'public, max-age=86400', // Cache for 1 day
-                'X-Cache-Key': cacheKey,
+                'Cache-Control': 'public, max-age=3600', // Limit stale daily progress to one hour
                 'X-Cache-Status': 'MISS'
             }
         });
@@ -224,4 +191,3 @@ async function handleGenerate(request, url, corsHeaders, ctx) {
         return new Response('Internal Server Error', { status: 500, headers: corsHeaders });
     }
 }
-
